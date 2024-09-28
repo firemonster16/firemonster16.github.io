@@ -303,5 +303,25 @@ LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
 DESCRIPTION: Gustus, expo dei sapori mediterranei
 END:VEVENT
 
+BEGIN:VEVENT
+UID:pharmexpo@2024.com
+SUMMARY:pharmexpo 2024
+DTSTART:20241025T160000Z
+DTEND:20241027T180000Z
+LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
+DESCRIPTION: Pharmexpo, salone dell'industria farmaceutica
+END:VEVENT
+
+BEGIN:VEVENT
+UID:arkeda@2024.com
+SUMMARY:arkeda 2024
+DTSTART:20241129T160000Z
+DTEND:20241201T180000Z
+LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
+DESCRIPTION: Arkeda, salone dell'architettura, edilizia, design ed arredo
+END:VEVENT
+
+
+
 
 END:VCALENDAR
