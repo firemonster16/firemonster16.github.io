@@ -250,7 +250,7 @@ DESCRIPTION:Partita in casa della Puteolana 1902 contro Sarrabus Ogliastra
 END:VEVENT
 
 BEGIN:VEVENT
-UID:puteolana14@2025.com
+UID:puteolana15@2025.com
 SUMMARY:Puteolana 1902 vs Savoia 1908
 DTSTART:20250406T160000Z
 DTEND:20250406T180000Z
@@ -259,7 +259,7 @@ DESCRIPTION:Partita in casa della Puteolana 1902 contro Savoia 1908
 END:VEVENT
 
 BEGIN:VEVENT
-UID:puteolana14@2025.com
+UID:puteolana16@2025.com
 SUMMARY:Puteolana 1902 vs Guidonia Montecelio
 DTSTART:20250417T160000Z
 DTEND:20250417T180000Z
@@ -268,12 +268,39 @@ DESCRIPTION:Partita in casa della Puteolana 1902 contro Guidonia Montecelio
 END:VEVENT
 
 BEGIN:VEVENT
-UID:puteolana14@2025.com
+UID:puteolana17@2025.com
 SUMMARY:Puteolana 1902 vs Cassino
 DTSTART:20250427T160000Z
 DTEND:20250427T180000Z
 LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
 DESCRIPTION:Partita in casa della Puteolana 1902 contro Cassino
+END:VEVENT
+
+BEGIN:VEVENT
+UID:aestetica@2024.com
+SUMMARY:aestetica 2024
+DTSTART:20241109T160000Z
+DTEND:20241111T180000Z
+LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
+DESCRIPTION: Beauty & Wellness Exhibition
+END:VEVENT
+
+BEGIN:VEVENT
+UID:creattiva@2024.com
+SUMMARY:creattiva 2024
+DTSTART:20241108T160000Z
+DTEND:20241110T180000Z
+LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
+DESCRIPTION: Creattiva, la fiera delle arti manuali
+END:VEVENT
+
+BEGIN:VEVENT
+UID:gustus@2024.com
+SUMMARY:gustus 2024
+DTSTART:20241117T160000Z
+DTEND:20241119T180000Z
+LOCATION:Mostra d'Oltremare, Fuorigrotta, Italy
+DESCRIPTION: Gustus, expo dei sapori mediterranei
 END:VEVENT
 
 
