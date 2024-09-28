@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//YourCompany//Napoli Home Matches Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:match1@example.com
+SUMMARY:Napoli vs Team1
+DTSTART:20241005T180000Z
+DTEND:20241005T200000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Team1
+END:VEVENT
+BEGIN:VEVENT
+UID:match2@example.com
+SUMMARY:Napoli vs Team2
+DTSTART:20241020T180000Z
+DTEND:20241020T200000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Team2
+END:VEVENT
+END:VCALENDAR
