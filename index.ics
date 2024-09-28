@@ -1,22 +1,115 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//YourCompany//Napoli Home Matches Calendar//EN
+PRODID:-//Napoli//Home Matches 2024-2025//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
+
 BEGIN:VEVENT
-UID:match1@example.com
-SUMMARY:Napoli vs Team1
-DTSTART:20241005T180000Z
-DTEND:20241005T200000Z
+UID:napoli1@2024.com
+SUMMARY:Napoli vs Lazio
+DTSTART:20240922T160000Z
+DTEND:20240922T180000Z
 LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Team1
+DESCRIPTION:Partita in casa del Napoli contro Lazio
 END:VEVENT
+
 BEGIN:VEVENT
-UID:match2@example.com
-SUMMARY:Napoli vs Team2
-DTSTART:20241020T180000Z
-DTEND:20241020T200000Z
+UID:napoli2@2024.com
+SUMMARY:Napoli vs Fiorentina
+DTSTART:20241006T160000Z
+DTEND:20241006T180000Z
 LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Team2
+DESCRIPTION:Partita in casa del Napoli contro Fiorentina
 END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli3@2024.com
+SUMMARY:Napoli vs Inter
+DTSTART:20241020T160000Z
+DTEND:20241020T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Inter
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli4@2024.com
+SUMMARY:Napoli vs Juventus
+DTSTART:20241103T160000Z
+DTEND:20241103T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Juventus
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli5@2024.com
+SUMMARY:Napoli vs Milan
+DTSTART:20241124T160000Z
+DTEND:20241124T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Milan
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli6@2024.com
+SUMMARY:Napoli vs Roma
+DTSTART:20241208T160000Z
+DTEND:20241208T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Roma
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli7@2024.com
+SUMMARY:Napoli vs Torino
+DTSTART:20250114T160000Z
+DTEND:20250114T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Torino
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli8@2024.com
+SUMMARY:Napoli vs Atalanta
+DTSTART:20250218T160000Z
+DTEND:20250218T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Atalanta
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli9@2024.com
+SUMMARY:Napoli vs Bologna
+DTSTART:20250310T160000Z
+DTEND:20250310T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Bologna
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli10@2024.com
+SUMMARY:Napoli vs Sassuolo
+DTSTART:20250324T160000Z
+DTEND:20250324T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Sassuolo
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli11@2024.com
+SUMMARY:Napoli vs Lecce
+DTSTART:20250414T160000Z
+DTEND:20250414T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Lecce
+END:VEVENT
+
+BEGIN:VEVENT
+UID:napoli12@2024.com
+SUMMARY:Napoli vs Genoa
+DTSTART:20250505T160000Z
+DTEND:20250505T180000Z
+LOCATION:Stadio Diego Armando Maradona, Naples, Italy
+DESCRIPTION:Partita in casa del Napoli contro Genoa
+END:VEVENT
+
 END:VCALENDAR
