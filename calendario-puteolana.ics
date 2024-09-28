@@ -1,0 +1,135 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Puteolana 1902//Home Matches 2024-2025//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Puteolana 1902 Home Matches 2024-2025
+X-WR-TIMEZONE:Europe/Rome
+
+BEGIN:VEVENT
+UID:puteolana1@2024.com
+SUMMARY:Puteolana 1902 vs Flegrea
+DTSTART:20240915T160000Z
+DTEND:20240915T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Flegrea
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana2@2024.com
+SUMMARY:Puteolana 1902 vs Gelbison
+DTSTART:20240929T160000Z
+DTEND:20240929T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Gelbison
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana3@2024.com
+SUMMARY:Puteolana 1902 vs Ilvamaddalena
+DTSTART:20241013T160000Z
+DTEND:20241013T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Ilvamaddalena
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana4@2024.com
+SUMMARY:Puteolana 1902 vs Lattedolce
+DTSTART:20241027T160000Z
+DTEND:20241027T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Lattedolce
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana5@2024.com
+SUMMARY:Puteolana 1902 vs Atletico Uri
+DTSTART:20241110T160000Z
+DTEND:20241110T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Atletico Uri
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana6@2024.com
+SUMMARY:Puteolana 1902 vs Real Monterotondo
+DTSTART:20241124T160000Z
+DTEND:20241124T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Real Monterotondo
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana7@2024.com
+SUMMARY:Puteolana 1902 vs Sarrabus Ogliastra
+DTSTART:20241208T160000Z
+DTEND:20241208T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Sarrabus Ogliastra
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana8@2024.com
+SUMMARY:Puteolana 1902 vs Terracina
+DTSTART:20241222T160000Z
+DTEND:20241222T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Terracina
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana9@2025.com
+SUMMARY:Puteolana 1902 vs Trastevere
+DTSTART:20250105T160000Z
+DTEND:20250105T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Trastevere
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana10@2025.com
+SUMMARY:Puteolana 1902 vs Cassino
+DTSTART:20250119T160000Z
+DTEND:20250119T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Cassino
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana11@2025.com
+SUMMARY:Puteolana 1902 vs Paganese
+DTSTART:20250202T160000Z
+DTEND:20250202T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Paganese
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana12@2025.com
+SUMMARY:Puteolana 1902 vs Cynthialbalonga
+DTSTART:20250216T160000Z
+DTEND:20250216T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Cynthialbalonga
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana13@2025.com
+SUMMARY:Puteolana 1902 vs Savoia
+DTSTART:20250301T160000Z
+DTEND:20250301T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Savoia
+END:VEVENT
+
+BEGIN:VEVENT
+UID:puteolana14@2025.com
+SUMMARY:Puteolana 1902 vs Guidonia Montecelio
+DTSTART:20250315T160000Z
+DTEND:20250315T180000Z
+LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
+DESCRIPTION:Partita in casa della Puteolana 1902 contro Guidonia Montecelio
+END:VEVENT
+
+END:VCALENDAR
