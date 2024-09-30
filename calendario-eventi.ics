@@ -465,5 +465,176 @@ LOCATION:Stadio Alberto Pinto, Caserta, Italy
 DESCRIPTION:Partita in casa della Casertana contro Crotone
 END:VEVENT
 
+BEGIN:VEVENT
+UID:santantimo01@2024.com
+SUMMARY:Sant'Antimo vs Crifo Wines Ruvo di Puglia
+DTSTART:20241002T160000Z
+DTEND:20241002T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Crifo Wines Ruvo di Puglia
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo02@2024.com
+SUMMARY:Sant'Antimo vs Allianz Pazienza San Severo
+DTSTART:20241016T160000Z
+DTEND:20241016T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Allianz Pazienza San Severo
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo03@2024.com
+SUMMARY:Sant'Antimo vs Solbat Golfo Piombino
+DTSTART:20241027T160000Z
+DTEND:20241027T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Solbat Golfo Piombino
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo04@2024.com
+SUMMARY:Sant'Antimo vs OraSì Ravenna
+DTSTART:20241106T160000Z
+DTEND:20241106T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro OraSì Ravenna
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo05@2024.com
+SUMMARY:Sant'Antimo vs Power Basket Salerno
+DTSTART:20241113T160000Z
+DTEND:20241113T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Power Basket Salerno
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo06@2024.com
+SUMMARY:Sant'Antimo vs BPC Virtus Cassino
+DTSTART:20241123T160000Z
+DTEND:20241123T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro BPC Virtus Cassino
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo07@2024.com
+SUMMARY:Sant'Antimo vs Ristopro Fabriano
+DTSTART:20241208T160000Z
+DTEND:20241208T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Ristopro Fabriano
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo08@2024.com
+SUMMARY:Sant'Antimo vs Virtus GVM Roma 1960
+DTSTART:20241222T160000Z
+DTEND:20241222T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Virtus GVM Roma 1960
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo09@2025.com
+SUMMARY:Sant'Antimo vs La T Tecnica Gema Montecatini
+DTSTART:20250105T160000Z
+DTEND:20250105T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro La T Tecnica Gema Montecatini
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo10@2025.com
+SUMMARY:Sant'Antimo vs Umana San Giobbe Chiusi
+DTSTART:20250115T160000Z
+DTEND:20250115T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Umana San Giobbe Chiusi
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo11@2025.com
+SUMMARY:Sant'Antimo vs Chieti Basket 1974
+DTSTART:20250126T160000Z
+DTEND:20250126T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Chieti Basket 1974
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo12@2025.com
+SUMMARY:Sant'Antimo vs Toscana Legno Pielle Livorno
+DTSTART:20250129T160000Z
+DTEND:20250129T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Toscana Legno Pielle Livorno
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo13@2025.com
+SUMMARY:Sant'Antimo vs Benacquista Assicurazioni Latina
+DTSTART:20250209T160000Z
+DTEND:20250209T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Benacquista Assicurazioni Latina
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo14@2025.com
+SUMMARY:Sant'Antimo vs General Contractor Jesi
+DTSTART:20250219T160000Z
+DTEND:20250219T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro General Contractor Jesi
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo15@2025.com
+SUMMARY:Sant'Antimo vs Paperdi Juvecaserta
+DTSTART:20250302T160000Z
+DTEND:20250302T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Paperdi Juvecaserta
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo16@2025.com
+SUMMARY:Sant'Antimo vs Fabo Herons Montecatini
+DTSTART:20250323T160000Z
+DTEND:20250323T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Fabo Herons Montecatini
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo17@2025.com
+SUMMARY:Sant'Antimo vs Liofilchem Roseto
+DTSTART:20250330T160000Z
+DTEND:20250330T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Liofilchem Roseto
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo18@2025.com
+SUMMARY:Sant'Antimo vs Luiss Roma
+DTSTART:20250413T160000Z
+DTEND:20250413T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro Luiss Roma
+END:VEVENT
+
+BEGIN:VEVENT
+UID:santantimo19@2025.com
+SUMMARY:Sant'Antimo vs NPC Rieti
+DTSTART:20250427T160000Z
+DTEND:20250427T180000Z
+LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
+DESCRIPTION:Partita in casa del Sant'Antimo contro NPC Rieti
+END:VEVENT
+
 
 END:VCALENDAR
