@@ -405,7 +405,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:casertana10@2025.com
 SUMMARY:Casertana vs Messina
-DTSTART:20250126T150000Z
+DTSTART:2025126T150000Z
 DTEND:20251226T170000Z
 LOCATION:Stadio Alberto Pinto, Caserta, Italy
 DESCRIPTION:Partita in casa della Casertana contro Messina
