@@ -635,7 +635,6 @@ LOCATION:Centro Sportivo Sant'Antimo, Sant'Antimo, Italy
 DESCRIPTION:Partita in casa del Sant'Antimo contro NPC Rieti
 END:VEVENT
 
-
 BEGIN:VEVENT
 SUMMARY:Gigi D'Alessio
 DTSTART:20250606T170000Z
@@ -643,4 +642,5 @@ DTEND:20250607T180000Z
 LOCATION:Stadio Diego Armando Maradona, Napoli, Italia
 DESCRIPTION:Evento Gigi D'Alessio
 END:VEVENT
+
 END:VCALENDAR
