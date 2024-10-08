@@ -402,12 +402,11 @@ DESCRIPTION:Partita in casa della Casertana contro AZ Picerno
 END:VEVENT
 
 BEGIN:VEVENT
-UID:casertana10@2025.com
 SUMMARY:Casertana vs Messina
-DTSTART:2025126T150000Z
-DTEND:20251226T170000Z
-LOCATION:Stadio Alberto Pinto, Caserta, Italy
-DESCRIPTION:Partita in casa della Casertana contro Messina
+DTSTART:20250126T170000Z
+DTEND:20250126T180000Z
+LOCATION:Stadio Alberto Pinto
+DESCRIPTION:Evento Casertana vs Messina
 END:VEVENT
 
 BEGIN:VEVENT
