@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Gestione Eventi</title>
+    <script type="text/javascript">
+        async function updateFileOnGitHub(event) {
+            event.preventDefault(); // Ferma l'invio del modulo
+
+            const owner = 'firemonster16'; // Sostituisci con il tuo username
+            const repo = 'firemonster16.github.io'; // Sostituisci con il nome del repository
+            const path = 'calendario-eventi.ics'; // Sostituisci con il percorso del file
+
+            const token = document.getElementById('TokenGit').value;// Sostituisci con il tuo token
+            const nEvento = document.getElementById('NomeEvento').value;
+            const dInizio = document.getElementById('dateI').value;
+            const dFine = document.getElementById('dateF').value;
+            let Luogo = document.getElementById('LuogoEvento').value;
+
+            // Correggi il nome del luogo
+            if (Luogo.toLowerCase() === 'stadio armando maradona') {
+                Luogo = 'Stadio Diego Armando Maradona, Napoli, Italia';
+            }
+
+            // Ottieni il contenuto attuale del file .ics
+            const getFileResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!getFileResponse.ok) {
+                console.error('Errore nel recupero del file:', await getFileResponse.text());
+                return;
+            }
+
+            const fileData = await getFileResponse.json();
+            const sha = fileData.sha;
+            const existingContent = atob(fileData.content); // Decodifica il contenuto esistente
+
+            // Controlla se l'evento esiste già
+            const oldEvent = existingContent.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g);
+            const eventExists = oldEvent && oldEvent.some(event => event.includes(nEvento));
+
+            let newContent;
+
+            if (eventExists) {
+                // Modifica l'evento esistente
+                const eventToReplace = oldEvent.find(event => event.includes(nEvento));
+                const newEvent = `BEGIN:VEVENT
+SUMMARY:${nEvento}
+DTSTART:${dInizio.replace(/-/g, '')}T170000Z
+DTEND:${dFine.replace(/-/g, '')}T180000Z
+LOCATION:${Luogo}
+DESCRIPTION:Evento ${nEvento}
+END:VEVENT`;
+
+                // Sostituisci l'evento trovato
+                newContent = existingContent.replace(eventToReplace, newEvent);
+            } else {
+                // Aggiungi il nuovo evento
+                const newEvent = `BEGIN:VEVENT
+SUMMARY:${nEvento}
+DTSTART:${dInizio.replace(/-/g, '')}T170000Z
+DTEND:${dFine.replace(/-/g, '')}T180000Z
+LOCATION:${Luogo}
+DESCRIPTION:Evento ${nEvento}
+END:VEVENT`;
+
+                // Crea il nuovo contenuto unendo quello esistente e il nuovo evento
+                newContent = existingContent.replace(/END:VCALENDAR/, `${newEvent}\n\nEND:VCALENDAR`);
+            }
+
+            // Crea la richiesta di aggiornamento del file
+            const updateFileResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: eventExists ? 'Modifica evento nel file .ics' : 'Aggiunta nuovo evento al file .ics',
+                    content: btoa(newContent), // Codifica in base64
+                    sha: sha
+                })
+            });
+
+            if (updateFileResponse.ok) {
+                const result = await updateFileResponse.json();
+                console.log('File aggiornato con successo:', result);
+                alert(eventExists ? 'Evento modificato con successo su GitHub!' : 'Evento salvato con successo su GitHub!');
+            } else {
+                console.error('Errore durante l\'aggiornamento del file:', await updateFileResponse.text());
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>GESTIONE EVENTI</h1>
+    <form class="gestioneEvento" method="post" onsubmit="updateFileOnGitHub(event)">
+        <div class="evento">
+            <label for="NomeEvento">Nome Evento:</label>
+            <input type="text" id="NomeEvento" name="NomeEvento" required>
+        </div>
+
+        <div class="dataInizio">
+            <label for="dateI">Seleziona una data di inizio:</label>
+            <input type="date" id="dateI" name="dateI" required>
+        </div>
+
+        <div class="dataFine">
+            <label for="dateF">Seleziona una data di fine:</label>
+            <input type="date" id="dateF" name="dateF" required>
+        </div>
+
+        <div class="Luogo">
+            <label for="LuogoEvento">Luogo Evento:</label>
+            <input type="text" id="LuogoEvento" name="LuogoEvento" required>
+        </div>
+
+        <div class="tgit">
+            <label for="tokenG">Token GitHub:</label>
+            <input type="text" id="TokenGit" name="TokenGit" required>
+        </div>
+
+        <button type="submit">Invia</button>
+    </form>
+</body>
+</html>
