@@ -643,4 +643,12 @@ LOCATION:Stadio Diego Armando Maradona, Napoli, Italia
 DESCRIPTION:Evento Gigi D'Alessio
 END:VEVENT
 
+BEGIN:VEVENT
+SUMMARY:Sfera Ebbasta
+DTSTART:20250607T170000Z
+DTEND:20250607T180000Z
+LOCATION:Stadio Diego Armando Maradona, Napoli, Italia
+DESCRIPTION:Evento Sfera Ebbasta
+END:VEVENT
+
 END:VCALENDAR
