@@ -7,12 +7,11 @@ X-WR-CALNAME:Eventi 2024/2025
 X-WR-TIMEZONE:Europe/Rome
 
 BEGIN:VEVENT
-UID:napoli4@2024.com
 SUMMARY:Napoli vs Como
-DTSTART:20241004T160000Z
-DTEND:20241004T180000Z
-LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Como
+DTSTART:20241003T170000Z
+DTEND:20241003T180000Z
+LOCATION:Stadio Diego Armando Maradona, Napoli, Italia
+DESCRIPTION:Evento Napoli vs Como
 END:VEVENT
 
 BEGIN:VEVENT
