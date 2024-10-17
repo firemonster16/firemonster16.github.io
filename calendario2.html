@@ -55,6 +55,11 @@ DTSTART:${dInizio.replace(/-/g, '')}T170000Z
 DTEND:${dFine.replace(/-/g, '')}T180000Z
 LOCATION:${Luogo}
 DESCRIPTION:Evento ${nEvento}
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:evento tra una settimana
+TRIGGER:-P1W
+END:VALARM
 END:VEVENT`;
 
                 // Sostituisci l'evento trovato
