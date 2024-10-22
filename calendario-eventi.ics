@@ -524,12 +524,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:casertana03@2024.com
 SUMMARY:Casertana vs Team Altamura
-DTSTART:20241029T150000Z
-DTEND:20241029T170000Z
-LOCATION:Stadio Alberto Pinto, Caserta, Italy
-DESCRIPTION:Partita in casa della Casertana contro Team Altamura
+DTSTART:20241031T170000Z
+DTEND:20241031T180000Z
+LOCATION:Stadio Alberto Pinto
+DESCRIPTION:Evento Casertana vs Team Altamura
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
