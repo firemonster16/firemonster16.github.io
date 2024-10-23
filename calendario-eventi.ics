@@ -244,12 +244,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:puteolana5@2024.com
-SUMMARY:Puteolana 1902 vs Sassari Latte Dolce 
-DTSTART:20241103T160000Z
-DTEND:20241103T180000Z
-LOCATION:Stadio Domenico Conte, Pozzuoli, Italy
-DESCRIPTION:Partita in casa della Puteolana 1902 contro Sassari Latte Dolce 
+SUMMARY:Puteolana 1902 vs Sassari Latte Dolce
+DTSTART:20241102T170000Z
+DTEND:20241102T180000Z
+LOCATION:?
+DESCRIPTION:Evento Puteolana 1902 vs Sassari Latte Dolce
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
