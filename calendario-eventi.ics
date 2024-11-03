@@ -552,7 +552,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:casertana05@2024.com
 SUMMARY:Casertana vs Giugliano
-DTSTART:20241123T1630000Z
+DTSTART:20241123T163000Z
 DTEND:20241123T200000Z
 LOCATION:Stadio Alberto Pinto, Caserta, Italy
 DESCRIPTION:Partita in casa della Casertana contro Giugliano
