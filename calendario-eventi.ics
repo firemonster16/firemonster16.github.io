@@ -144,12 +144,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:napoli14@2024.com
 SUMMARY:Napoli vs Fiorentina
-DTSTART:20250323T160000Z
-DTEND:20250323T180000Z
-LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Fiorentina
+DTSTART:20250309T170000Z
+DTEND:20250309T180000Z
+LOCATION:Stadio Diego Armando Maradona
+DESCRIPTION:Evento Napoli vs Fiorentina
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
