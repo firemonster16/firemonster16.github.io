@@ -184,12 +184,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:napoli17@2024.com
 SUMMARY:Napoli vs Cagliari
-DTSTART:20250525T160000Z
+DTSTART:20250525T170000Z
 DTEND:20250525T180000Z
-LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Cagliari
+LOCATION:Stadio Diego Armando Maradona
+DESCRIPTION:Evento Napoli vs Cagliari
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
