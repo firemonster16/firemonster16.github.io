@@ -171,12 +171,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:napoli16@2024.com
 SUMMARY:Napoli vs Genoa
-DTSTART:20250511T160000Z
+DTSTART:20250511T170000Z
 DTEND:20250511T180000Z
-LOCATION:Stadio Diego Armando Maradona, Naples, Italy
-DESCRIPTION:Partita in casa del Napoli contro Genoa
+LOCATION:Stadio Diego Armando Maradona
+DESCRIPTION:Evento Napoli vs Genoa
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
