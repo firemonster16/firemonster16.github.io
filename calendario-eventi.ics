@@ -697,12 +697,11 @@ END:VALARM
 END:VEVENT
 
 BEGIN:VEVENT
-UID:casertana15@2025.com
 SUMMARY:Casertana vs Crotone
-DTSTART:20250419T150000Z
-DTEND:20250419T170000Z
-LOCATION:Stadio Alberto Pinto, Caserta, Italy
-DESCRIPTION:Partita in casa della Casertana contro Crotone
+DTSTART:20250419T170000Z
+DTEND:20250419T180000Z
+LOCATION:Stadio Alberto Pinto
+DESCRIPTION:Evento Casertana vs Crotone
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:evento tra una settimana
