@@ -11,7 +11,6 @@ if not TOKEN:
 
 HEADERS = {"X-Auth-Token": TOKEN}
 COMPETITION_CODE = "SA"
-
 OUTPUT_FILE = "calendario-napoli.ics"
 
 def is_napoli(name: str) -> bool:
@@ -30,11 +29,7 @@ def is_time_tbd(dt_utc):
 
 def main():
     matches = get_matches()
-
     cal = Calendar()
-    cal.extra.append("CALSCALE:GREGORIAN")
-    cal.extra.append("X-WR-CALNAME:Napoli (Casa) - Serie A")
-    cal.extra.append("X-WR-TIMEZONE:Europe/Rome")
 
     for m in matches:
         home = m["homeTeam"]["name"]
@@ -50,7 +45,7 @@ def main():
 
         start_utc = parser.isoparse(utc_date)  # di solito timezone-aware (Z)
 
-        # se SCHEDULED e orario TBD (00:00Z), salta finché non lo aggiornano
+        # se SCHEDULED e orario TBD (00:00Z), salta
         if m.get("status") == "SCHEDULED" and is_time_tbd(start_utc):
             continue
 
