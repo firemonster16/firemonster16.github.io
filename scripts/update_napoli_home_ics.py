@@ -24,7 +24,6 @@ def get_matches():
     return r.json().get("matches", [])
 
 def is_time_tbd(dt_utc):
-    # spesso 00:00Z = orario non ancora definito
     return dt_utc.hour == 0 and dt_utc.minute == 0 and dt_utc.second == 0
 
 def main():
@@ -43,11 +42,12 @@ def main():
         if not utc_date:
             continue
 
-        start_utc = parser.isoparse(utc_date)  # di solito timezone-aware (Z)
+        start_utc = parser.isoparse(utc_date)  # timezone-aware (Z)
 
-        # se SCHEDULED e orario TBD (00:00Z), salta
-        if m.get("status") == "SCHEDULED" and is_time_tbd(start_utc):
-            continue
+        status = m.get("status", "")
+        matchday = m.get("matchday")
+
+        tbd = (status == "SCHEDULED" and is_time_tbd(start_utc))
 
         end_utc = start_utc + timedelta(hours=2)
 
@@ -56,14 +56,16 @@ def main():
 
         e = Event()
         e.uid = uid
-        e.name = f"NAPOLI vs {away}"
         e.begin = start_utc
         e.end = end_utc
         e.location = "Stadio Diego Armando Maradona, Napoli"
 
-        matchday = m.get("matchday")
-        status = m.get("status", "")
-        e.description = f"Serie A - Giornata {matchday} - Status: {status}"
+        if tbd:
+            e.name = f"NAPOLI vs {away} (ORARIO DA DEFINIRE)"
+            e.description = f"Serie A - Giornata {matchday} - Status: {status} - ORARIO DA DEFINIRE"
+        else:
+            e.name = f"NAPOLI vs {away}"
+            e.description = f"Serie A - Giornata {matchday} - Status: {status}"
 
         cal.events.add(e)
 
