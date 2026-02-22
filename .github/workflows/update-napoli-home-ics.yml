@@ -2,7 +2,7 @@ name: Update Napoli Home ICS
 
 on:
   schedule:
-    - cron: "25 3 * * *"  # ogni giorno alle 03:25 UTC
+    - cron: "25 3 * * *"  # ogni giorno 03:25 UTC
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Install deps
         run: |
-          pip install requests ics pytz python-dateutil
+          pip install requests ics python-dateutil
 
       - name: Generate calendario-napoli.ics
         env:
