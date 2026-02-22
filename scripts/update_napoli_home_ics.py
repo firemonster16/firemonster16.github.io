@@ -4,23 +4,19 @@ import requests
 from datetime import timedelta
 from dateutil import parser
 from ics import Calendar, Event
-import pytz
-
-TZ = pytz.timezone("Europe/Rome")
 
 TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
 if not TOKEN:
     raise SystemExit("Missing FOOTBALL_DATA_TOKEN secret")
 
 HEADERS = {"X-Auth-Token": TOKEN}
-
-# Serie A su football-data.org è tipicamente "SA"
 COMPETITION_CODE = "SA"
 
-# Match robusto sul nome (per evitare mismatch tipo "Napoli" vs "SSC Napoli")
-def is_napoli(team_name: str) -> bool:
-    t = re.sub(r"\s+", " ", team_name.strip().lower())
-    return "napoli" in t  # prende "SSC Napoli", "Napoli", ecc.
+OUTPUT_FILE = "calendario-napoli.ics"
+
+def is_napoli(name: str) -> bool:
+    t = re.sub(r"\s+", " ", name.strip().lower())
+    return "napoli" in t
 
 def get_matches():
     url = f"https://api.football-data.org/v4/competitions/{COMPETITION_CODE}/matches"
@@ -28,16 +24,17 @@ def get_matches():
     r.raise_for_status()
     return r.json().get("matches", [])
 
-def to_rome_dt(utc_iso: str):
-    dt = parser.isoparse(utc_iso)
-    if dt.tzinfo is None:
-        dt = pytz.utc.localize(dt)
-    return dt.astimezone(TZ)
+def is_time_tbd(dt_utc):
+    # spesso 00:00Z = orario non ancora definito
+    return dt_utc.hour == 0 and dt_utc.minute == 0 and dt_utc.second == 0
 
 def main():
     matches = get_matches()
 
     cal = Calendar()
+    cal.extra.append("CALSCALE:GREGORIAN")
+    cal.extra.append("X-WR-CALNAME:Napoli (Casa) - Serie A")
+    cal.extra.append("X-WR-TIMEZONE:Europe/Rome")
 
     for m in matches:
         home = m["homeTeam"]["name"]
@@ -51,8 +48,13 @@ def main():
         if not utc_date:
             continue
 
-        start = to_rome_dt(utc_date)
-        end = start + timedelta(hours=2)
+        start_utc = parser.isoparse(utc_date)  # di solito timezone-aware (Z)
+
+        # se SCHEDULED e orario TBD (00:00Z), salta finché non lo aggiornano
+        if m.get("status") == "SCHEDULED" and is_time_tbd(start_utc):
+            continue
+
+        end_utc = start_utc + timedelta(hours=2)
 
         match_id = m.get("id")
         uid = f"napoli-home-{match_id}@firemonster16"
@@ -60,24 +62,17 @@ def main():
         e = Event()
         e.uid = uid
         e.name = f"NAPOLI vs {away}"
-        e.begin = start
-        e.end = end
+        e.begin = start_utc
+        e.end = end_utc
+        e.location = "Stadio Diego Armando Maradona, Napoli"
 
         matchday = m.get("matchday")
         status = m.get("status", "")
         e.description = f"Serie A - Giornata {matchday} - Status: {status}"
 
-        # spesso "venue" non c'è su football-data; se c'è lo mettiamo
-        venue = m.get("venue")
-        if venue:
-            e.location = venue
-        else:
-            e.location = "Stadio Diego Armando Maradona, Napoli"
-
         cal.events.add(e)
 
-    # IMPORTANTISSIMO: sovrascrive esattamente il file che hai nel repo
-    with open("calendario-napoli.ics", "w", encoding="utf-8") as f:
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(cal.serialize())
 
 if __name__ == "__main__":
