@@ -37,12 +37,6 @@ jobs:
       # -------------------------
       # Juve Stabia
       # -------------------------
-      - name: Generate calendario-juvestabia.ics
-        env:
-          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
-        run: |
-          python scripts/update_juvestabia_home_ics.py
-        continue-on-error: true
 
       # -------------------------
       # Commit se cambiato
@@ -51,5 +45,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add calendario-napoli.ics calendario-juvestabia.ics
+          git add calendario-napoli.ics
           git diff --cached --quiet || (git commit -m "chore: update football calendars" && git push)
