@@ -42,6 +42,7 @@ jobs:
           FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
         run: |
           python scripts/update_juvestabia_home_ics.py
+        continue-on-error: true
 
       # -------------------------
       # Commit se cambiato
