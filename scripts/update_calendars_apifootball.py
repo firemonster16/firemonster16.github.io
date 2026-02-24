@@ -1,11 +1,10 @@
 import os
-import re
 import time
 import requests
 from datetime import timedelta
 from dateutil import parser
 from ics import Calendar, Event
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Tuple
 
 
 BASE_URL = "https://v3.football.api-sports.io"
@@ -15,12 +14,10 @@ if not API_KEY:
 
 HEADERS = {"x-apisports-key": API_KEY}
 
-# --- Config squadre/calendari ---
-# league_prefix: usato per filtrare i fixtures solo nella competizione voluta
 TEAMS = [
     {
         "team_search": "Napoli",
-        "league_prefix": "Serie A",
+        "league_prefix": "Serie A",          # usato solo come filtro "soft"
         "output": "calendario-napoli.ics",
         "summary_prefix": "NAPOLI",
         "home_only": True,
@@ -34,7 +31,6 @@ TEAMS = [
     },
     {
         "team_search": "Casertana",
-        # Serie C spesso appare come "Serie C - Girone C" ecc. => startswith "Serie C"
         "league_prefix": "Serie C",
         "output": "calendario-casertana.ics",
         "summary_prefix": "CASERTANA",
@@ -42,176 +38,146 @@ TEAMS = [
     },
 ]
 
-# Status utili per includere future + passate
-# API-FOOTBALL usa status tipo: NS (not started), FT (finished), PST, CANC, etc.
-ALLOWED_STATUSES = None  # None = prendi tutto e filtra per league; se vuoi, puoi limitare
-
-
 def current_season_start_year() -> int:
-    """
-    API-FOOTBALL usa season = anno di inizio stagione (es. 2025 per 2025/26).
-    Regola pratica: se mese >= 7 => season = anno corrente, altrimenti anno corrente - 1
-    """
+    # stagione calcistica: 2025/26 -> season=2025
     import datetime
     now = datetime.datetime.utcnow()
     return now.year if now.month >= 7 else now.year - 1
 
-
 def api_get(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
     url = f"{BASE_URL}{path}"
     r = requests.get(url, headers=HEADERS, params=params, timeout=30)
-    # Gestione rate limit soft
+
+    # basic rate-limit handling
     if r.status_code == 429:
-        # aspetta e riprova una volta
         time.sleep(2)
         r = requests.get(url, headers=HEADERS, params=params, timeout=30)
+
     r.raise_for_status()
     return r.json()
 
-
-def normalize(s: str) -> str:
-    return re.sub(r"\s+", " ", s.strip().lower())
-
-
 def find_team_id(team_search: str) -> Tuple[int, str]:
-    """
-    Cerca team_id tramite endpoint /teams?search=...
-    """
     data = api_get("/teams", {"search": team_search})
     resp = data.get("response", [])
     if not resp:
         raise SystemExit(f"Team not found via /teams search: {team_search}")
 
-    # Pick migliore: match esatto se possibile
-    wanted = normalize(team_search)
-    best = resp[0]
-    for item in resp:
-        name = item.get("team", {}).get("name", "")
-        if normalize(name) == wanted:
-            best = item
-            break
-
-    team = best["team"]
+    # prende il primo (di solito è quello giusto)
+    team = resp[0]["team"]
     return int(team["id"]), team["name"]
 
-
 def fetch_all_fixtures(team_id: int, season: int) -> List[Dict[str, Any]]:
-    """
-    Scarica tutte le fixtures del team per season.
-    Gestisce pagination: response.paging.total
-    """
     all_items: List[Dict[str, Any]] = []
     page = 1
     total_pages = 1
 
     while page <= total_pages:
-        params = {"team": team_id, "season": season, "page": page}
-        data = api_get("/fixtures", params)
-
+        data = api_get("/fixtures", {"team": team_id, "season": season, "page": page})
         paging = data.get("paging") or {}
         total_pages = int(paging.get("total", 1))
-
         items = data.get("response", [])
         all_items.extend(items)
         page += 1
-
-        # piccolo delay per stare tranquilli col free tier (10/min)
         time.sleep(0.2)
 
     return all_items
 
+def startswith_ci(hay: str, pref: str) -> bool:
+    return hay.strip().lower().startswith(pref.strip().lower())
 
-def league_matches_target(league_name: str, league_prefix: str) -> bool:
-    # Match "prefix" per coprire casi tipo "Serie C - Girone C"
-    return normalize(league_name).startswith(normalize(league_prefix))
-
-
-def build_calendar_for_team(cfg: Dict[str, Any], fixtures: List[Dict[str, Any]]) -> Calendar:
+def build_calendar(cfg: Dict[str, Any], team_id: int, fixtures: List[Dict[str, Any]]) -> Calendar:
     cal = Calendar()
 
-    league_prefix = cfg["league_prefix"]
-    home_only = cfg["home_only"]
-    summary_prefix = cfg["summary_prefix"]
-    team_search = cfg["team_search"]
+    kept_total = 0
+    kept_home = 0
+    kept_league = 0
 
     for item in fixtures:
-        league = item.get("league", {})
-        league_name = league.get("name", "")
-        if not league_matches_target(league_name, league_prefix):
+        league = item.get("league", {}) or {}
+        league_name = league.get("name", "") or ""
+
+        # filtro "soft" sulla lega (Serie A/B/C)
+        # se vuoi disattivarlo: commenta queste 2 righe
+        if cfg.get("league_prefix") and not startswith_ci(league_name, cfg["league_prefix"]):
             continue
+        kept_league += 1
 
-        fixture = item.get("fixture", {})
-        teams = item.get("teams", {})
-        home = teams.get("home", {})
-        away = teams.get("away", {})
+        teams = item.get("teams", {}) or {}
+        home = teams.get("home", {}) or {}
+        away = teams.get("away", {}) or {}
 
-        home_name = home.get("name", "")
-        away_name = away.get("name", "")
+        home_id = home.get("id")
+        away_name = away.get("name", "Unknown")
 
-        # home_only: includi solo se il team cercato è la squadra di casa
-        if home_only:
-            if normalize(home_name).find(normalize(team_search)) == -1 and normalize(team_search) not in normalize(home_name):
-                # fallback: usa flag winner? no; meglio match substring
-                # Se non matcha, scarta
+        # SOLO IN CASA: filtro robusto per ID
+        if cfg.get("home_only", False):
+            if int(home_id or -1) != int(team_id):
                 continue
+            kept_home += 1
 
-        # date ISO
+        fixture = item.get("fixture", {}) or {}
+        fixture_id = fixture.get("id")
         dt_str = fixture.get("date")
-        if not dt_str:
+
+        if not fixture_id or not dt_str:
             continue
-        start = parser.isoparse(dt_str)  # timezone-aware
+
+        start = parser.isoparse(dt_str)
         end = start + timedelta(hours=2)
 
-        fixture_id = fixture.get("id")
-        if not fixture_id:
-            continue
-
-        # Venue
         venue = fixture.get("venue", {}) or {}
-        venue_name = venue.get("name")
-        venue_city = venue.get("city")
         location = None
-        if venue_name and venue_city:
-            location = f"{venue_name}, {venue_city}"
-        elif venue_name:
-            location = str(venue_name)
+        if venue.get("name") and venue.get("city"):
+            location = f"{venue['name']}, {venue['city']}"
+        elif venue.get("name"):
+            location = str(venue["name"])
 
-        # Status
-        status = (fixture.get("status") or {}).get("short", "")
-        # Title
-        # Se home-only, titolo coerente "SQUADRA vs OSPITE"
-        title = f"{summary_prefix} vs {away_name}"
+        status_short = (fixture.get("status") or {}).get("short", "")
+        round_name = league.get("round", "")
 
         e = Event()
-        e.uid = f"{normalize(summary_prefix).replace(' ','')}-home-{fixture_id}@firemonster16"
-        e.name = title
+        e.uid = f"{cfg['summary_prefix'].lower().replace(' ','')}-home-{fixture_id}@firemonster16"
+        e.name = f"{cfg['summary_prefix']} vs {away_name}"
         e.begin = start
         e.end = end
         if location:
             e.location = location
 
-        round_name = league.get("round", "")
-        e.description = f"{league_name} - {round_name} - Status: {status}"
-
+        e.description = f"{league_name} - {round_name} - Status: {status_short}"
         cal.events.add(e)
+        kept_total += 1
+
+    print(
+        f"[{cfg['team_search']}] fixtures={len(fixtures)} "
+        f"after_league={kept_league} after_home={kept_home} events_written={kept_total}"
+    )
 
     return cal
 
-
 def main():
     season = current_season_start_year()
+    print(f"Using season={season}")
 
     for cfg in TEAMS:
         team_id, team_real_name = find_team_id(cfg["team_search"])
         fixtures = fetch_all_fixtures(team_id, season)
-        cal = build_calendar_for_team(cfg, fixtures)
 
-        out = cfg["output"]
-        with open(out, "w", encoding="utf-8") as f:
+        # DEBUG extra: mostra 5 nomi lega trovati (capire se matcha il filtro)
+        leagues = []
+        for it in fixtures[:50]:
+            ln = (it.get("league", {}) or {}).get("name", "")
+            if ln and ln not in leagues:
+                leagues.append(ln)
+            if len(leagues) >= 5:
+                break
+        print(f"[{cfg['team_search']}] team_id={team_id} team_name='{team_real_name}' sample_leagues={leagues}")
+
+        cal = build_calendar(cfg, team_id, fixtures)
+
+        with open(cfg["output"], "w", encoding="utf-8") as f:
             f.write(cal.serialize())
 
-        print(f"OK: wrote {out} for team='{team_real_name}' season={season} events={len(cal.events)}")
-
+        print(f"OK wrote {cfg['output']}")
 
 if __name__ == "__main__":
     main()
