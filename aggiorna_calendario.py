@@ -88,14 +88,6 @@ def fetch_page(url):
 
     parser.feed(html)
 
-    print(f"Pagina scaricata: {len(html)} caratteri")
-    print(f"Elementi di testo estratti: {len(parser.parts)}")
-
-    print("=== PRIMI ELEMENTI DELLA PAGINA ===")
-    for item in parser.parts[:80]:
-        print(repr(item))
-    print("=== FINE DEBUG ===")
-
     return parser.parts
 
 
@@ -199,69 +191,69 @@ def parse_matches(lines, team):
 
     matches = []
 
-    # La pagina del Corriere presenta i dati così:
-    #
-    # Serie A
-    # domenica 30.08.2026
-    # Napoli 18:30 Como
-    #
-    # Per questo analizziamo direttamente:
-    # competizione -> data -> partita
+    for index in range(len(lines) - 4):
 
-    for index, line in enumerate(lines):
+        # Struttura reale della pagina:
+        #
+        # Serie A
+        # sabato 10.10.2026
+        # Napoli
+        # 20:45
+        # Frosinone
 
-        # Cerchiamo soltanto la competizione
-        # che ci interessa.
-        if line.strip() != team["competition"]:
+        competition = lines[index].strip()
+
+        if competition != team["competition"]:
             continue
 
-        date = None
-        match_line = None
+        date_text = lines[index + 1].strip()
 
-        # Nei pochi elementi successivi devono esserci
-        # data e partita.
-        for candidate in lines[index + 1:index + 8]:
+        date_match = re.search(
+            r"(\d{2}\.\d{2}\.\d{4})",
+            date_text
+        )
 
-            # Cerca una data nel formato 30.08.2026
-            date_match = re.search(
-                r"(\d{2}\.\d{2}\.\d{4})",
-                candidate
-            )
-
-            if date_match and date is None:
-
-                try:
-
-                    date = datetime.strptime(
-                        date_match.group(1),
-                        "%d.%m.%Y"
-                    ).date()
-
-                except ValueError:
-                    pass
-
-                continue
-
-            # Dopo aver trovato la data,
-            # cerchiamo "Squadra 18:30 Squadra"
-            if date:
-
-                game_match = re.match(
-                    r"^(.+?)\s+(\d{2}:\d{2})\s+(.+?)$",
-                    candidate.strip()
-                )
-
-                if game_match:
-
-                    match_line = game_match
-                    break
-
-        if not date or not match_line:
+        if not date_match:
             continue
 
-        home = match_line.group(1).strip()
-        time = match_line.group(2).strip()
-        away = match_line.group(3).strip()
+        try:
+
+            date = datetime.strptime(
+                date_match.group(1),
+                "%d.%m.%Y"
+            ).date()
+
+        except ValueError:
+            continue
+
+        home = lines[index + 2].strip()
+        result_or_time = lines[index + 3].strip()
+        away = lines[index + 4].strip()
+
+        # Le partite già disputate hanno ad esempio:
+        # Napoli
+        # 1 - 0
+        # Bologna
+        #
+        # Non ci interessano perché non hanno
+        # più un orario futuro da aggiornare.
+        if re.fullmatch(
+            r"\d+\s*-\s*\d+",
+            result_or_time
+        ):
+            continue
+
+        # Le partite future hanno invece:
+        # Napoli
+        # 20:45
+        # Frosinone
+        if not re.fullmatch(
+            r"\d{2}:\d{2}",
+            result_or_time
+        ):
+            continue
+
+        time = result_or_time
 
         # Evita eventuali orari placeholder.
         if time in {
@@ -280,26 +272,7 @@ def parse_matches(lines, team):
             )
         )
 
-    # Elimina eventuali duplicati
-    unique = []
-
-    seen = set()
-
-    for match in matches:
-
-        key = (
-            match[0],
-            match[1],
-            normalize(match[2]),
-            normalize(match[3]),
-        )
-
-        if key not in seen:
-
-            seen.add(key)
-            unique.append(match)
-
-    return unique
+    return matches
 
 
 # ============================================================
