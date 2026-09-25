@@ -191,66 +191,107 @@ def parse_matches(lines, team):
 
     matches = []
 
-    competition = None
+    # La pagina del Corriere presenta i dati così:
+    #
+    # Serie A
+    # domenica 30.08.2026
+    # Napoli 18:30 Como
+    #
+    # Per questo analizziamo direttamente:
+    # competizione -> data -> partita
 
     for index, line in enumerate(lines):
 
-        if line in (
-            "Serie A",
-            "Serie B",
-            "Serie C Girone C",
-            "Champions League",
-            "Coppa Italia",
-        ):
-
-            competition = line
+        # Cerchiamo soltanto la competizione
+        # che ci interessa.
+        if line.strip() != team["competition"]:
             continue
 
-        match_date = DATE_RE.match(line)
+        date = None
+        match_line = None
 
-        if not match_date:
-            continue
+        # Nei pochi elementi successivi devono esserci
+        # data e partita.
+        for candidate in lines[index + 1:index + 8]:
 
-        if competition != team["competition"]:
-            continue
+            # Cerca una data nel formato 30.08.2026
+            date_match = re.search(
+                r"(\d{2}\.\d{2}\.\d{4})",
+                candidate
+            )
 
-        date = datetime.strptime(
-            match_date.group(1),
-            "%d.%m.%Y"
-        ).date()
+            if date_match and date is None:
 
-        for candidate in lines[index + 1:index + 7]:
+                try:
 
-            future = FUTURE_RE.match(candidate)
+                    date = datetime.strptime(
+                        date_match.group(1),
+                        "%d.%m.%Y"
+                    ).date()
 
-            if future:
+                except ValueError:
+                    pass
 
-                home, time, away = future.groups()
+                continue
 
-                # Orari usati frequentemente come placeholder
-                # prima dell'ufficializzazione.
-                if time in {
-                    "00:00",
-                    "01:00",
-                    "02:00",
-                }:
-                    break
+            # Dopo aver trovato la data,
+            # cerchiamo "Squadra 18:30 Squadra"
+            if date:
 
-                matches.append(
-                    (
-                        date,
-                        time,
-                        home.strip(),
-                        away.strip(),
-                    )
+                game_match = re.match(
+                    r"^(.+?)\s+(\d{2}:\d{2})\s+(.+?)$",
+                    candidate.strip()
                 )
 
-                break
+                if game_match:
 
-            if RESULT_RE.match(candidate):
-                break
+                    match_line = game_match
+                    break
 
-    return matches
+        if not date or not match_line:
+            continue
+
+        home = match_line.group(1).strip()
+        time = match_line.group(2).strip()
+        away = match_line.group(3).strip()
+
+        # Evita eventuali orari placeholder.
+        if time in {
+            "00:00",
+            "01:00",
+            "02:00",
+        }:
+            continue
+
+        matches.append(
+            (
+                date,
+                time,
+                home,
+                away,
+            )
+        )
+
+    # Elimina eventuali duplicati
+    unique = []
+
+    seen = set()
+
+    for match in matches:
+
+        key = (
+            match[0],
+            match[1],
+            normalize(match[2]),
+            normalize(match[3]),
+        )
+
+        if key not in seen:
+
+            seen.add(key)
+            unique.append(match)
+
+    return unique
 
 
 # ============================================================
