@@ -88,6 +88,14 @@ def fetch_page(url):
 
     parser.feed(html)
 
+    print(f"Pagina scaricata: {len(html)} caratteri")
+    print(f"Elementi di testo estratti: {len(parser.parts)}")
+
+    print("=== PRIMI ELEMENTI DELLA PAGINA ===")
+    for item in parser.parts[:80]:
+        print(repr(item))
+    print("=== FINE DEBUG ===")
+
     return parser.parts
 
 
