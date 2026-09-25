@@ -1,0 +1,52 @@
+name: Aggiorna calendario partite
+
+on:
+  schedule:
+    # Controllo automatico ogni lunedi e venerdi
+    - cron: "15 8 * * 1,5"
+
+  # Permette anche di avviare manualmente il controllo
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aggiorna-calendario
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Controlla date e orari delle partite
+        run: python aggiorna_calendario.py
+
+      - name: Controlla eventuali modifiche
+        id: changes
+        run: |
+          if git diff --quiet -- calendario-eventi.ics; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nessuna modifica al calendario."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Sono state trovate modifiche."
+          fi
+
+      - name: Salva aggiornamenti
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "calendar-bot"
+          git config user.email "calendar-bot@users.noreply.github.com"
+          git add calendario-eventi.ics
+          git commit -m "Aggiornamento automatico calendario partite"
+          git push
