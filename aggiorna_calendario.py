@@ -1,1246 +1,232 @@
 #!/usr/bin/env python3
-
+"""Aggiorna il calendario ICS delle partite casalinghe, senza toccare altri eventi."""
 import re
 import sys
-import urllib.request
 import unicodedata
+import urllib.request
 from datetime import datetime, timedelta, timezone
-from zoneinfo import ZoneInfo
 from html.parser import HTMLParser
+from pathlib import Path
+from zoneinfo import ZoneInfo
 
-
-ICS_FILE = "calendario-eventi.ics"
-ROME = ZoneInfo("Europe/Rome")
-
-
-# ============================================================
-# SQUADRE GESTITE
-# ============================================================
-
+ICS_FILE = Path(__file__).with_name('calendario-eventi.ics')
+ROME = ZoneInfo('Europe/Rome')
 TEAMS = {
-
-    "NAPOLI": {
-        "url": "https://www.corrieredellosport.it/squadra/calcio/napoli/calendario/t459",
-        "source": "corriere",
-        "competition": "Serie A",
-        "location": "STADIO DIEGO ARMANDO MARADONA, NAPOLI, ITALIA",
-        "aliases": ["Napoli"],
-    },
-
-    "CASERTANA": {
-        "url": "https://www.corrieredellosport.it/squadra/calcio/casertana/calendario/t2478",
-        "source": "corriere",
-        "competition": "Serie C Girone C",
-        "location": "STADIO ALBERTO PINTO, CASERTA, ITALY",
-        "aliases": ["Casertana"],
-    },
-
-    "SAVOIA": {
-        "url": "https://www.corrieredellosport.it/squadra/calcio/savoia/calendario/t3629",
-        "source": "corriere",
-        "competition": "Serie C Girone C",
-        "location": "STADIO ALFREDO GIRAUD, TORRE ANNUNZIATA, ITALIA",
-        "aliases": ["Savoia"],
-    },
-
-    "JUVE STABIA": {
-        "url": "https://www.corrieredellosport.it/squadra/calcio/juve-stabia/calendario/t2184",
-        "source": "corriere",
-        "competition": "Serie B",
-        "location": "STADIO ROMEO MENTI, CASTELLAMMARE DI STABIA, ITALY",
-        "aliases": ["Juve Stabia"],
-    },
-
-    "PSA NAPOLI EST": {
-        "url": "https://www.legapallacanestro.com/serie-b/psa-napoli-est",
-        "source": "lnp",
-        "location": "PALADENNERLEIN, NAPOLI, ITALIA",
-        "aliases": [
-            "PSA Napoli Est",
-            "PSA Basket Napoli",
-            "PSA Napoli",
-        ],
-    },
+    'NAPOLI': {'url': 'https://www.corrieredellosport.it/squadra/calcio/napoli/calendario/t459', 'source': 'corriere', 'competitions': ['Serie A', 'Champions League', 'UEFA Champions League'], 'location': 'STADIO DIEGO ARMANDO MARADONA, NAPOLI, ITALIA', 'aliases': ['Napoli']},
+    'CASERTANA': {'url': 'https://www.corrieredellosport.it/squadra/calcio/casertana/calendario/t2478', 'source': 'corriere', 'competitions': ['Serie C Girone C'], 'location': 'STADIO ALBERTO PINTO, CASERTA, ITALY', 'aliases': ['Casertana']},
+    'SAVOIA': {'url': 'https://www.corrieredellosport.it/squadra/calcio/savoia/calendario/t3629', 'source': 'corriere', 'competitions': ['Serie C Girone C'], 'location': 'STADIO ALFREDO GIRAUD, TORRE ANNUNZIATA, ITALIA', 'aliases': ['Savoia']},
+    'JUVE STABIA': {'url': 'https://www.corrieredellosport.it/squadra/calcio/juve-stabia/calendario/t2184', 'source': 'corriere', 'competitions': ['Serie B'], 'location': 'STADIO ROMEO MENTI, CASTELLAMMARE DI STABIA, ITALY', 'aliases': ['Juve Stabia']},
+    'PSA NAPOLI EST': {'url': 'https://www.legapallacanestro.com/serie-b/psa-napoli-est', 'source': 'lnp', 'location': 'PALADENNERLEIN, NAPOLI, ITALIA', 'aliases': ['PSA Napoli Est', 'PSA Basket Napoli', 'PSA Napoli']},
 }
-
-
-# ============================================================
-# NORMALIZZAZIONE NOMI
-# ============================================================
-
-def normalize(text):
-
-    text = unicodedata.normalize(
-        "NFKD",
-        text
-    )
-
-    text = "".join(
-        char
-        for char in text
-        if not unicodedata.combining(char)
-    )
-
-    text = text.lower()
-
-    text = text.replace("–", "-")
-    text = text.replace("—", "-")
-
-    text = re.sub(
-        r"[^a-z0-9]+",
-        " ",
-        text
-    )
-
-    return " ".join(
-        text.split()
-    )
-
-
 ALIASES = {
-
-    "internazionale ii": [
-        "inter u23",
-        "inter ii",
-        "internazionale u23",
-    ],
-
-    "cerignola": [
-        "audace cerignola",
-        "audace cerig",
-    ],
-
-    "fc sudtirol": [
-        "sudtirol",
-        "südtirol",
-    ],
-
-    "verona": [
-        "hellas verona",
-    ],
-
-    "psa napoli est": [
-        "psa basket napoli",
-        "psa napoli",
-        "psa napoli est",
-    ],
+    'internazionale ii': ['inter u23', 'inter ii', 'internazionale u23'],
+    'cerignola': ['audace cerignola', 'audace cerig'],
+    'fc sudtirol': ['sudtirol', 'südtirol'],
+    'verona': ['hellas verona'],
+    'psa napoli est': ['psa basket napoli', 'psa napoli'],
 }
 
+def normalize(s):
+    s = ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c))
+    return ' '.join(re.sub(r'[^a-z0-9]+', ' ', s.lower()).split())
 
-def canonical_team(name):
-
-    value = normalize(name)
-
-    for canonical, variants in ALIASES.items():
-
-        group = {
-            normalize(canonical),
-            *(normalize(x) for x in variants),
-        }
-
-        if value in group:
-            return normalize(canonical)
-
-    return value
-
+def canonical(s):
+    n = normalize(s)
+    for main, variants in ALIASES.items():
+        if n in {normalize(x) for x in [main, *variants]}:
+            return normalize(main)
+    return n
 
 def equivalent(a, b):
-
-    return (
-        canonical_team(a)
-        ==
-        canonical_team(b)
-    )
-
-
-def match_key(home, away):
-
-    return (
-        canonical_team(home),
-        canonical_team(away),
-    )
-
-
-# ============================================================
-# CORRIERE DELLO SPORT
-# ============================================================
+    return canonical(a) == canonical(b)
 
 class TextExtractor(HTMLParser):
-
     def __init__(self):
-
         super().__init__()
-
         self.parts = []
-
     def handle_data(self, data):
+        value = ' '.join(data.split())
+        if value:
+            self.parts.append(value)
 
-        text = " ".join(
-            data.split()
-        )
+class TableExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.rows, self.row, self.cell = [], None, None
+    def handle_starttag(self, tag, attrs):
+        if tag == 'tr':
+            self.row = []
+        elif tag in ('td', 'th') and self.row is not None:
+            self.cell = []
+    def handle_data(self, data):
+        if self.cell is not None:
+            self.cell.append(data)
+    def handle_endtag(self, tag):
+        if tag in ('td', 'th') and self.cell is not None:
+            self.row.append(' '.join(''.join(self.cell).split()))
+            self.cell = None
+        elif tag == 'tr' and self.row is not None:
+            if self.row:
+                self.rows.append(self.row)
+            self.row = None
 
-        if text:
-            self.parts.append(text)
+def fetch(url):
+    request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (compatible; CalendarUpdater/5.0)'})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return response.read().decode('utf-8', errors='replace')
 
-
-def fetch_page(url):
-
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent":
-            "Mozilla/5.0 (compatible; CalendarUpdater/4.0)"
-        },
-    )
-
-    with urllib.request.urlopen(
-        request,
-        timeout=30
-    ) as response:
-
-        html = response.read().decode(
-            "utf-8",
-            errors="replace"
-        )
-
+def parse_corriere(html, team):
     parser = TextExtractor()
-
     parser.feed(html)
-
-    return parser.parts
-
-
-def parse_matches(lines, team):
-
+    lines = parser.parts
     matches = []
-
-    for index in range(
-        len(lines) - 4
-    ):
-
-        competition = (
-            lines[index].strip()
-        )
-
-        if (
-            competition
-            !=
-            team["competition"]
-        ):
+    allowed = {normalize(x) for x in team['competitions']}
+    for i in range(len(lines) - 4):
+        competition = lines[i].strip()
+        if normalize(competition) not in allowed:
             continue
-
-        date_match = re.search(
-            r"(\d{2}\.\d{2}\.\d{4})",
-            lines[index + 1]
-        )
-
+        date_match = re.search(r'(\d{2}\.\d{2}\.\d{4})', lines[i + 1])
         if not date_match:
             continue
-
         try:
-
-            date = datetime.strptime(
-                date_match.group(1),
-                "%d.%m.%Y"
-            ).date()
-
+            date = datetime.strptime(date_match.group(1), '%d.%m.%Y').date()
         except ValueError:
             continue
-
-        home = (
-            lines[index + 2]
-            .strip()
-        )
-
-        result_or_time = (
-            lines[index + 3]
-            .strip()
-        )
-
-        away = (
-            lines[index + 4]
-            .strip()
-        )
-
-        # Partita già disputata:
-        # 2 - 1
-        if re.fullmatch(
-            r"\d+\s*-\s*\d+",
-            result_or_time
-        ):
+        home, time, away = (x.strip() for x in lines[i + 2:i + 5])
+        if not re.fullmatch(r'(?:[01]\d|2[0-3]):[0-5]\d', time) or time in {'00:00', '01:00', '02:00'}:
             continue
-
-        # Partita futura:
-        # 20:45
-        if not re.fullmatch(
-            r"\d{2}:\d{2}",
-            result_or_time
-        ):
-            continue
-
-        time = result_or_time
-
-        # Orari palesemente placeholder
-        if time in {
-            "00:00",
-            "01:00",
-            "02:00",
-        }:
-            continue
-
-        matches.append(
-            (
-                date,
-                time,
-                home,
-                away,
-            )
-        )
-
+        matches.append((date, time, home, away, 'Champions League' if 'champions' in normalize(competition) else competition))
     return matches
 
-
-# ============================================================
-# LEGA NAZIONALE PALLACANESTRO
-# ============================================================
-
-class LNPTableParser(HTMLParser):
-
-    def __init__(self):
-
-        super().__init__()
-
-        self.in_tr = False
-        self.in_td = False
-
-        self.current_cell = []
-        self.current_row = []
-
-        self.rows = []
-
-    def handle_starttag(
-        self,
-        tag,
-        attrs
-    ):
-
-        if tag == "tr":
-
-            self.in_tr = True
-            self.current_row = []
-
-        elif (
-            tag == "td"
-            and
-            self.in_tr
-        ):
-
-            self.in_td = True
-            self.current_cell = []
-
-    def handle_data(
-        self,
-        data
-    ):
-
-        if self.in_td:
-
-            text = " ".join(
-                data.split()
-            )
-
-            if text:
-
-                self.current_cell.append(
-                    text
-                )
-
-    def handle_endtag(
-        self,
-        tag
-    ):
-
-        if (
-            tag == "td"
-            and
-            self.in_td
-        ):
-
-            value = " ".join(
-                self.current_cell
-            ).strip()
-
-            self.current_row.append(
-                value
-            )
-
-            self.current_cell = []
-            self.in_td = False
-
-        elif (
-            tag == "tr"
-            and
-            self.in_tr
-        ):
-
-            if self.current_row:
-
-                self.rows.append(
-                    self.current_row
-                )
-
-            self.current_row = []
-            self.in_tr = False
-
-
-def fetch_lnp_matches(url):
-
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent":
-            "Mozilla/5.0 (compatible; CalendarUpdater/4.0)"
-        },
-    )
-
-    with urllib.request.urlopen(
-        request,
-        timeout=30
-    ) as response:
-
-        html = response.read().decode(
-            "utf-8",
-            errors="replace"
-        )
-
-    parser = LNPTableParser()
-
+def parse_lnp(html):
+    parser = TableExtractor()
     parser.feed(html)
-
     matches = []
-
     for row in parser.rows:
-
-        if len(row) < 3:
-            continue
-
-        # Cerchiamo la cella contenente
-        # data + ora.
-        date_index = None
-        date = None
-        time = None
-
-        for index, value in enumerate(
-            row
-        ):
-
-            match = re.search(
-                r"(\d{2}/\d{2}/\d{4})"
-                r"\s+"
-                r"(\d{2}:\d{2})",
-                value
-            )
-
-            if match:
-
-                try:
-
-                    date = datetime.strptime(
-                        match.group(1),
-                        "%d/%m/%Y"
-                    ).date()
-
-                except ValueError:
-                    continue
-
-                time = match.group(2)
-
-                date_index = index
-
-                break
-
-        if date_index is None:
-            continue
-
-        # Cerchiamo le due squadre nelle
-        # celle successive.
-        remaining = [
-
-            value.strip()
-
-            for value
-            in row[
-                date_index + 1:
-            ]
-
-            if value.strip()
-        ]
-
-        if len(remaining) < 2:
-            continue
-
-        home = remaining[0]
-        away = remaining[1]
-
-        if time in {
-            "00:00",
-            "01:00",
-            "02:00",
-        }:
-            continue
-
-        matches.append(
-            (
-                date,
-                time,
-                home,
-                away,
-            )
-        )
-
+        for i, value in enumerate(row):
+            found = re.search(r'(\d{2}/\d{2}/\d{4})\s+([01]\d|2[0-3]):([0-5]\d)', value)
+            if not found or len(row) < i + 3:
+                continue
+            try:
+                date = datetime.strptime(found.group(1), '%d/%m/%Y').date()
+            except ValueError:
+                continue
+            matches.append((date, found.group(2) + ':' + found.group(3), row[i + 1], row[i + 2], 'Serie B Nazionale'))
+            break
     return matches
 
-
-# ============================================================
-# LETTURA ICS
-# ============================================================
-
-def get_events(text):
-
-    return re.findall(
-        r"BEGIN:VEVENT\r?\n"
-        r".*?"
-        r"\r?\nEND:VEVENT",
-        text,
-        flags=re.S,
-    )
-
-
-def get_field(
-    event,
-    name
-):
-
-    match = re.search(
-        rf"^{re.escape(name)}:(.*)$",
-        event,
-        flags=re.M,
-    )
-
-    if match:
-
-        return (
-            match.group(1)
-            .strip()
-        )
-
-    return ""
-
-
-def get_teams_from_summary(
-    summary
-):
-
-    summary = (
-        summary.strip()
-    )
-
-    summary = re.sub(
-        r"^(PARTITA\s+|CALCIO\s+)",
-        "",
-        summary,
-        flags=re.I,
-    )
-
-    # Formato:
-    # NAPOLI VS ROMA
-    parts = re.split(
-        r"\s+\bVS\b\s+",
-        summary,
-        maxsplit=1,
-        flags=re.I,
-    )
-
-    if len(parts) == 2:
-
-        return (
-            parts[0].strip(),
-            parts[1].strip(),
-        )
-
-    # Formato:
-    # NAPOLI - ROMA
-    parts = re.split(
-        r"\s+[-–—]\s+",
-        summary,
-        maxsplit=1,
-    )
-
-    if len(parts) == 2:
-
-        return (
-            parts[0].strip(),
-            parts[1].strip(),
-        )
-
-    return None
-
-
-def is_managed_home_team(home):
-
-    for team in TEAMS.values():
-
-        if any(
-            equivalent(
-                home,
-                alias
-            )
-            for alias
-            in team["aliases"]
-        ):
-
-            return True
-
-    return False
-
-
-def find_event(
-    events,
-    home,
-    away
-):
-
-    wanted = match_key(
-        home,
-        away
-    )
-
-    for index, event in enumerate(
-        events
-    ):
-
-        teams = get_teams_from_summary(
-            get_field(
-                event,
-                "SUMMARY"
-            )
-        )
-
-        if not teams:
-            continue
-
-        existing = match_key(
-            teams[0],
-            teams[1]
-        )
-
-        if existing == wanted:
-
-            return index
-
-    return None
-
-
-# ============================================================
-# RIMOZIONE DUPLICATI
-# ============================================================
-
-def remove_duplicate_matches(
-    events
-):
-
-    seen = set()
-    cleaned = []
-    removed = []
-
-    for event in events:
-
-        summary = get_field(
-            event,
-            "SUMMARY"
-        )
-
-        teams = (
-            get_teams_from_summary(
-                summary
-            )
-        )
-
-        # Non è una partita riconoscibile:
-        # concerto, fiera, evento manuale...
-        if not teams:
-
-            cleaned.append(
-                event
-            )
-
-            continue
-
-        home, away = teams
-
-        # Non appartiene alle squadre
-        # gestite automaticamente.
-        if not is_managed_home_team(
-            home
-        ):
-
-            cleaned.append(
-                event
-            )
-
-            continue
-
-        key = match_key(
-            home,
-            away
-        )
-
-        if key in seen:
-
-            removed.append(
-                summary
-            )
-
-            continue
-
-        seen.add(key)
-
-        cleaned.append(
-            event
-        )
-
-    return (
-        cleaned,
-        removed
-    )
-
-
-# ============================================================
-# DATA / ORA
-# ============================================================
-
-def to_utc(
-    date,
-    time
-):
-
-    hour, minute = map(
-        int,
-        time.split(":")
-    )
-
-    local_time = datetime(
-        date.year,
-        date.month,
-        date.day,
-        hour,
-        minute,
-        tzinfo=ROME,
-    )
-
-    utc_time = (
-        local_time.astimezone(
-            timezone.utc
-        )
-    )
-
-    return utc_time.strftime(
-        "%Y%m%dT%H%M%SZ"
-    )
-
-
-def end_to_utc(
-    date,
-    time
-):
-
-    hour, minute = map(
-        int,
-        time.split(":")
-    )
-
-    local_time = datetime(
-        date.year,
-        date.month,
-        date.day,
-        hour,
-        minute,
-        tzinfo=ROME,
-    )
-
-    local_time += timedelta(
-        hours=2
-    )
-
-    utc_time = (
-        local_time.astimezone(
-            timezone.utc
-        )
-    )
-
-    return utc_time.strftime(
-        "%Y%m%dT%H%M%SZ"
-    )
-
-
-# ============================================================
-# MODIFICA VEVENT
-# ============================================================
-
-def replace_field(
-    event,
-    name,
-    value
-):
-
-    pattern = (
-        rf"^{re.escape(name)}:.*$"
-    )
-
-    if re.search(
-        pattern,
-        event,
-        flags=re.M
-    ):
-
-        return re.sub(
-            pattern,
-            f"{name}:{value}",
-            event,
-            flags=re.M,
-        )
-
-    return event.replace(
-        "END:VEVENT",
-        f"{name}:{value}\n"
-        "END:VEVENT"
-    )
-
-
-def update_event(
-    event,
-    date,
-    time,
-    location
-):
-
-    event = replace_field(
-        event,
-        "DTSTART",
-        to_utc(
-            date,
-            time
-        )
-    )
-
-    event = replace_field(
-        event,
-        "DTEND",
-        end_to_utc(
-            date,
-            time
-        )
-    )
-
-    if location:
-
-        event = replace_field(
-            event,
-            "LOCATION",
-            location
-        )
-
+EVENT_RE = re.compile(r'BEGIN:VEVENT\r?\n.*?\r?\nEND:VEVENT', re.S)
+
+def field(event, name):
+    found = re.search(r'^' + re.escape(name) + r':(.*)$', event, re.M)
+    return found.group(1).strip() if found else ''
+
+def summary_teams(summary):
+    summary = re.sub(r'^(?:PARTITA|CALCIO)\s+', '', summary.strip(), flags=re.I)
+    summary = re.sub(r'\s*[-–—]\s*CHAMPIONS LEAGUE\s*$', '', summary, flags=re.I)
+    parts = re.split(r'\s+VS\s+|\s+[-–—]\s+', summary, maxsplit=1, flags=re.I)
+    return (parts[0].strip(), parts[1].strip()) if len(parts) == 2 else None
+
+def managed_home(home):
+    return any(any(equivalent(home, alias) for alias in team['aliases']) for team in TEAMS.values())
+
+def event_key(event):
+    teams = summary_teams(field(event, 'SUMMARY'))
+    if not teams or not managed_home(teams[0]):
+        return None
+    return canonical(teams[0]), canonical(teams[1])
+
+def utc_string(date, time, hours=0):
+    h, m = map(int, time.split(':'))
+    local = datetime(date.year, date.month, date.day, h, m, tzinfo=ROME) + timedelta(hours=hours)
+    return local.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+
+def set_field(event, name, value):
+    pattern = re.compile(r'^' + re.escape(name) + r':[^\r\n]*', re.M)
+    if pattern.search(event):
+        return pattern.sub(lambda _: name + ':' + value, event, count=1)
+    return event.replace('END:VEVENT', name + ':' + value + '\nEND:VEVENT', 1)
+
+def update_event(event, date, time, location):
+    for name, value in [('DTSTART', utc_string(date, time)), ('DTEND', utc_string(date, time, 2)), ('LOCATION', location)]:
+        event = set_field(event, name, value)
     return event
 
-
-# ============================================================
-# CREAZIONE NUOVO EVENTO
-# ============================================================
-
-def create_event(
-    team_name,
-    home,
-    away,
-    date,
-    time,
-    location
-):
-
-    uid = (
-        canonical_team(home)
-        .replace(" ", "-")
-        + "-"
-        + canonical_team(away)
-        .replace(" ", "-")
-        + "-"
-        + date.isoformat()
-        + "@firemonster16"
-    )
-
-    return "\n".join([
-
-        "BEGIN:VEVENT",
-
-        f"UID:{uid}",
-
-        (
-            f"SUMMARY:"
-            f"{home.upper()} VS "
-            f"{away.upper()}"
-        ),
-
-        (
-            f"DTSTART:"
-            f"{to_utc(date, time)}"
-        ),
-
-        (
-            f"DTEND:"
-            f"{end_to_utc(date, time)}"
-        ),
-
-        f"LOCATION:{location}",
-
-        (
-            f"DESCRIPTION:"
-            f"PARTITA IN CASA DEL "
-            f"{team_name} CONTRO "
-            f"{away.upper()}"
-        ),
-
-        f"X-AUTO-TEAM:{team_name}",
-
-        "BEGIN:VALARM",
-
-        "ACTION:DISPLAY",
-
-        (
-            f"DESCRIPTION:"
-            f"{home.upper()} VS "
-            f"{away.upper()}"
-        ),
-
-        "TRIGGER:-P1W",
-
-        "END:VALARM",
-
-        "END:VEVENT",
-    ])
-
-
-# ============================================================
-# RICOSTRUZIONE CALENDARIO
-# ============================================================
-
-def rebuild_calendar(
-    original,
-    final_events
-):
-
-    first_event = re.search(
-        r"BEGIN:VEVENT\r?\n",
-        original
-    )
-
-    if not first_event:
-
-        raise RuntimeError(
-            "Nessun VEVENT trovato "
-            "nel calendario."
-        )
-
-    last_events = list(
-        re.finditer(
-            r"END:VEVENT",
-            original
-        )
-    )
-
-    if not last_events:
-
-        raise RuntimeError(
-            "Calendario ICS non valido."
-        )
-
-    prefix = original[
-        :first_event.start()
+def create_event(team_name, home, away, date, time, location, competition):
+    uid = '-'.join([canonical(home).replace(' ', '-'), canonical(away).replace(' ', '-'), date.isoformat()]) + '@firemonster16'
+    title = f'{home.upper()} VS {away.upper()}'
+    if competition == 'Champions League':
+        title += ' - CHAMPIONS LEAGUE'
+    lines = [
+        'BEGIN:VEVENT', f'UID:{uid}', f'SUMMARY:{title}',
+        f'DTSTART:{utc_string(date, time)}', f'DTEND:{utc_string(date, time, 2)}',
+        f'LOCATION:{location}', f'DESCRIPTION:PARTITA IN CASA DEL {team_name} CONTRO {away.upper()} - {competition}',
+        f'X-AUTO-TEAM:{team_name}', 'BEGIN:VALARM', 'ACTION:DISPLAY',
+        f'DESCRIPTION:{title}', 'TRIGGER:-P1W', 'END:VALARM', 'END:VEVENT',
     ]
-
-    suffix = original[
-        last_events[-1].end():
-    ]
-
-    body = "\n\n".join(
-        final_events
-    )
-
-    return (
-        prefix.rstrip()
-        + "\n"
-        + body
-        + "\n"
-        + suffix.lstrip()
-    )
-
-
-# ============================================================
-# MAIN
-# ============================================================
+    return '\n'.join(lines)
 
 def main():
-
-    with open(
-        ICS_FILE,
-        "r",
-        encoding="utf-8"
-    ) as file:
-
-        original = file.read()
-
-    original_events = get_events(
-        original
-    )
-
-    events, duplicates_removed = (
-        remove_duplicate_matches(
-            original_events
-        )
-    )
-
-    modified = []
-    added = []
-
-    if duplicates_removed:
-
-        print(
-            "\nDuplicati trovati "
-            "nel calendario:"
-        )
-
-        for item in duplicates_removed:
-
-            print(
-                "RIMOSSO DUPLICATO:",
-                item
-            )
-
-    # --------------------------------------------------------
-    # CONTROLLO SQUADRE
-    # --------------------------------------------------------
-
-    for team_name, team in TEAMS.items():
-
-        print(
-            f"\nControllo {team_name}..."
-        )
-
-        try:
-
-            # -----------------------------
-            # LNP
-            # -----------------------------
-
-            if (
-                team["source"]
-                ==
-                "lnp"
-            ):
-
-                matches = (
-                    fetch_lnp_matches(
-                        team["url"]
-                    )
-                )
-
-            # -----------------------------
-            # CORRIERE DELLO SPORT
-            # -----------------------------
-
-            else:
-
-                page = fetch_page(
-                    team["url"]
-                )
-
-                matches = parse_matches(
-                    page,
-                    team
-                )
-
-        except Exception as error:
-
-            print(
-                f"ERRORE {team_name}: "
-                f"{error}",
-                file=sys.stderr
-            )
-
+    original = ICS_FILE.read_text(encoding='utf-8')
+    original_matches = list(EVENT_RE.finditer(original))
+    if not original_matches or 'END:VCALENDAR' not in original:
+        raise RuntimeError('Calendario ICS non valido o privo di eventi.')
+    events = [m.group(0) for m in original_matches]
+    # Elimina duplicati soltanto per partite riconosciute delle squadre gestite.
+    seen, cleaned, removed = set(), [], []
+    for event in events:
+        key = event_key(event)
+        if key is not None and key in seen:
+            removed.append(field(event, 'SUMMARY'))
             continue
-
-        # ----------------------------------------------------
-        # SOLO PARTITE CASALINGHE
-        # ----------------------------------------------------
-
-        home_matches = [
-
-            match
-
-            for match in matches
-
-            if any(
-                equivalent(
-                    match[2],
-                    alias
-                )
-
-                for alias
-                in team["aliases"]
-            )
-        ]
-
-        print(
-            f"{len(home_matches)} "
-            "partite casalinghe trovate"
-        )
-
-        # ----------------------------------------------------
-        # AGGIORNA / CREA
-        # ----------------------------------------------------
-
-        for (
-            date,
-            time,
-            home,
-            away
-        ) in home_matches:
-
-            event_index = find_event(
-                events,
-                home,
-                away
-            )
-
-            # Evento già presente
-            if event_index is not None:
-
-                old_event = (
-                    events[
-                        event_index
-                    ]
-                )
-
-                new_event = update_event(
-                    old_event,
-                    date,
-                    time,
-                    team["location"],
-                )
-
-                if (
-                    new_event
-                    !=
-                    old_event
-                ):
-
-                    events[
-                        event_index
-                    ] = new_event
-
-                    modified.append(
-                        f"{home} - "
-                        f"{away}: "
-                        f"{date.strftime('%d/%m/%Y')} "
-                        f"{time}"
-                    )
-
-            # Evento non presente
-            else:
-
-                events.append(
-                    create_event(
-                        team_name,
-                        home,
-                        away,
-                        date,
-                        time,
-                        team["location"],
-                    )
-                )
-
-                added.append(
-                    f"{home} - "
-                    f"{away}: "
-                    f"{date.strftime('%d/%m/%Y')} "
-                    f"{time}"
-                )
-
-    # --------------------------------------------------------
-    # RICOSTRUZIONE ICS
-    # --------------------------------------------------------
-
-    output = rebuild_calendar(
-        original,
-        events
-    )
-
-    # --------------------------------------------------------
-    # SALVATAGGIO
-    # --------------------------------------------------------
-
+        if key is not None:
+            seen.add(key)
+        cleaned.append(event)
+    events = cleaned
+    changed, added = [], []
+    failures = []
+    for team_name, team in TEAMS.items():
+        print(f'\nControllo {team_name}...')
+        try:
+            html = fetch(team['url'])
+            matches = parse_lnp(html) if team['source'] == 'lnp' else parse_corriere(html, team)
+            home_matches = [m for m in matches if any(equivalent(m[2], alias) for alias in team['aliases'])]
+            print(f'{len(home_matches)} partite casalinghe trovate')
+            if not home_matches:
+                failures.append(team_name + ': nessuna partita trovata')
+                continue
+            for date, time, home, away, competition in home_matches:
+                key = canonical(home), canonical(away)
+                index = next((i for i, e in enumerate(events) if event_key(e) == key), None)
+                if index is not None:
+                    updated = update_event(events[index], date, time, team['location'])
+                    if updated != events[index]:
+                        events[index] = updated
+                        changed.append(f'{home} - {away}: {date:%d/%m/%Y} {time}')
+                else:
+                    events.append(create_event(team_name, home, away, date, time, team['location'], competition))
+                    added.append(f'{home} - {away}: {date:%d/%m/%Y} {time} ({competition})')
+        except Exception as exc:
+            failures.append(f'{team_name}: {exc}')
+            print(f'ERRORE {team_name}: {exc}', file=sys.stderr)
+    # Preserva intestazione, chiusura e tutti gli eventi non gestiti.
+    prefix = original[:original_matches[0].start()]
+    suffix = original[original_matches[-1].end():]
+    output = prefix.rstrip('\r\n') + '\n' + '\n'.join(events) + '\n' + suffix.lstrip('\r\n')
     if output != original:
-
-        with open(
-            ICS_FILE,
-            "w",
-            encoding="utf-8",
-            newline="\n"
-        ) as file:
-
-            file.write(
-                output
-            )
-
-        print(
-            "\n"
-            "=============================="
-        )
-
-        print(
-            "CALENDARIO AGGIORNATO"
-        )
-
-        print(
-            "=============================="
-        )
-
-        for item in duplicates_removed:
-
-            print(
-                "RIMOSSO DUPLICATO:",
-                item
-            )
-
-        for item in modified:
-
-            print(
-                "MODIFICATA:",
-                item
-            )
-
-        for item in added:
-
-            print(
-                "AGGIUNTA:",
-                item
-            )
-
+        ICS_FILE.write_text(output, encoding='utf-8', newline='\n')
+        print('\nCALENDARIO AGGIORNATO')
     else:
+        print('\nNessuna modifica necessaria.')
+    for label, items in [('RIMOSSO DUPLICATO', removed), ('MODIFICATA', changed), ('AGGIUNTA', added)]:
+        for item in items:
+            print(f'{label}: {item}')
+    if failures:
+        for item in failures:
+            print('ATTENZIONE:', item, file=sys.stderr)
+        # Segnala il problema nel workflow: evita un commit automatico parziale.
+        return 1
+    return 0
 
-        print(
-            "\nNessuna modifica necessaria."
-        )
-
-
-if __name__ == "__main__":
-
-    main()
+if __name__ == '__main__':
+    sys.exit(main())
